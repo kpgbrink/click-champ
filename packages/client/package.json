@@ -18,6 +18,7 @@
     "tslint": "^5.19.0",
     "typescript": "3.5.3"
   },
+  "proxy": "http://localhost:3001",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
