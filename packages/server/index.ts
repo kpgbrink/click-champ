@@ -1,26 +1,26 @@
-import express from 'express';
 import bodyParser from 'body-parser';
+import express from 'express';
 import {
     Runtype,
     Static,
 } from 'runtypes';
 import {
-    IEmptyRuntype,
-} from '../types/IEmpty';
-import {
     IAppleRuntype,
 } from '../types/IApple';
+import {
+    IEmptyRuntype,
+} from '../types/IEmpty';
 
-const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response, next: express.NextFunction)=>Promise<void>) => async (req:express.Request, res:express.Response, next:express.NextFunction) => {
+const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let endCalled = false;
-    const end:(...args:any[])=>void = res.end;
-    res.end = function (...args:any[]) {
+    const end: (...args: any[]) => void = res.end;
+    res.end = function (...args: any[]) {
         endCalled = true;
         end.apply(this, args);
     };
 
     let nextCalled = false;
-    const interceptingNext:express.NextFunction = ex => {
+    const interceptingNext: express.NextFunction = ex => {
         nextCalled = true;
         next(ex);
     };
@@ -36,9 +36,9 @@ const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response
     }
 };
 
-const typedAsyncHandler = <TRequestRuntype extends Runtype, TResponseRuntype extends Runtype>(requestRuntype: TRequestRuntype, responseRuntype: TResponseRuntype, handlerAsync: (body:Static<typeof requestRuntype>) => Promise<Static<typeof responseRuntype>>) => {
+const typedAsyncHandler = <TRequestRuntype extends Runtype, TResponseRuntype extends Runtype>(requestRuntype: TRequestRuntype, responseRuntype: TResponseRuntype, handlerAsync: (body: Static<typeof requestRuntype>) => Promise<Static<typeof responseRuntype>>) => {
     return asyncHandler(async (req, res) => {
-        const body:{} = req.body;
+        const body: {} = req.body;
         if (!requestRuntype.guard(req.body)) {
             res.status(400).json("malformed POST data");
             return;
@@ -58,13 +58,13 @@ api.post('/apple', typedAsyncHandler(IEmptyRuntype, IEmptyRuntype, async () => {
 api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async apple => {
     if (apple.isGreen) {
         return {
-            isYummy: true,
             isGreen: true,
+            isYummy: true,
         };
     }
     return {
-        isYummy: false,
         isGreen: false,
+        isYummy: false,
     };
 }));
 
@@ -72,8 +72,9 @@ api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async apple 
     const app = express();
     app.use('/api', api);
     const port = 3001;
-    app.listen(port, (ex) => {
-        if (ex) throw ex;
+    app.listen(port, ex => {
+        if (ex) { throw ex; }
+        // tslint:disable-next-line: no-console
         console.log(`Listening on ${port}`);
     });
 }

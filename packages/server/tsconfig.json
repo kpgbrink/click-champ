@@ -7,6 +7,6 @@
     "forceConsistentCasingInFileNames": true,
     "module": "commonjs",
     "moduleResolution": "node",
-    "isolatedModules": true,
+    "isolatedModules": true
   }
 }
