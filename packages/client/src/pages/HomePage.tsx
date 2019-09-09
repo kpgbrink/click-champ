@@ -1,7 +1,7 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss';
 import IApple from '../../../types/IApple';
-import Component from '../Component';
+import Component, {AjajMethod} from '../Component';
 
 // import logo from './logo.svg';
 
@@ -46,7 +46,7 @@ class HomePage extends Component<{}, {
   doSomethingNiceAsync = async () => {
     const result = await this.ajaj<IApple, IApple>({
       data: this.state.apple,
-      method: this.ajajTypes.METHOD_POST,
+      method: AjajMethod.POST,
       uri: '/api/orange',
     });
 

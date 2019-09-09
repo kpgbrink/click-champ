@@ -1,15 +1,22 @@
 import * as React from 'react';
-import {ajaj, AjajFunctionOptionsType } from './tools';
+import {ajaj, AjajFunctionOptionsType, AjajMethod} from './tools';
+
+export {AjajMethod};
 
 export default class Component<P= {}, S= {}, SS= any> extends React.PureComponent<P, S, SS> {
-    controller = new AbortController();
-    ajajTypes = ajaj;
+    abortController = new AbortController();
 
     ajaj = async <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>) => {
-        return await ajaj<TRequest, TRequest>(options, this.controller.signal);
+        try {
+            return await ajaj<TRequest, TRequest>(options, this.abortController.signal);
+        } catch (e) {
+            if (e && e.name === 'AbortError' && this.abortController.signal.aborted) {
+
+            }
+        }
     }
 
     componentWillUnmount() {
-        this.controller.abort();
+        this.abortController.abort();
     }
 }
