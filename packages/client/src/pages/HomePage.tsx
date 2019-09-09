@@ -1,6 +1,7 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss';
 import IApple from '../../../types/IApple';
+import { ajaj } from '../tools';
 
 // import logo from './logo.svg';
 
@@ -43,13 +44,12 @@ class HomePage extends React.Component<{}, {
     };
   }
   doSomethingNiceAsync = async () => {
-    const result: IApple = await (await fetch(process.env.PUBLIC_URL + '/api/orange', {
-      body: JSON.stringify(this.state.apple),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-    })).json();
+    const result = await ajaj<IApple, IApple>({
+      data: this.state.apple,
+      method: ajaj.METHOD_POST,
+      uri: '/api/orange',
+    });
+
     this.setState({
       apple: result,
     });
