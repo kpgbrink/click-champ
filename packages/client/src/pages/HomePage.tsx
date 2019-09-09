@@ -1,7 +1,7 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss';
 import IApple from '../../../types/IApple';
-import { ajaj } from '../tools';
+import Component from '../Component';
 
 // import logo from './logo.svg';
 
@@ -31,7 +31,7 @@ const useStyles = createUseStyles({
   },
 });
 
-class HomePage extends React.Component<{}, {
+class HomePage extends Component<{}, {
   apple: IApple,
 }> {
   constructor(props: {}) {
@@ -44,9 +44,9 @@ class HomePage extends React.Component<{}, {
     };
   }
   doSomethingNiceAsync = async () => {
-    const result = await ajaj<IApple, IApple>({
+    const result = await this.ajaj<IApple, IApple>({
       data: this.state.apple,
-      method: ajaj.METHOD_POST,
+      method: this.ajajTypes.METHOD_POST,
       uri: '/api/orange',
     });
 

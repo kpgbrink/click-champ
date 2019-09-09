@@ -1,8 +1,3 @@
-
-export function TestMethod<T>(blach: T): T {
-    return blach as T;
-}
-
 type METHOD_GET = 'GET';
 const METHOD_GET: METHOD_GET = 'GET';
 type METHOD_POST = 'POST';
@@ -21,20 +16,21 @@ interface IAjajFunctionOptionsData<TRequest> {
     method: typeof METHOD_PUT | typeof METHOD_POST;
     uri: string;
 }
-type AjajFunctionOptionsType<TRequest> = IAjajFunctionOptions | IAjajFunctionOptionsData<TRequest>;
+export type AjajFunctionOptionsType<TRequest> = IAjajFunctionOptions | IAjajFunctionOptionsData<TRequest>;
 interface IAjajFunction {
-    <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>): Promise<TResponse>;
+    <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>, signal: AbortSignal | null): Promise<TResponse>;
     METHOD_GET: METHOD_GET;
     METHOD_POST: typeof METHOD_POST;
     METHOD_PUT: typeof METHOD_PUT;
     METHOD_DELETE: typeof METHOD_DELETE;
 }
 
-export const ajaj: IAjajFunction = async <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>) => {
+export const ajaj: IAjajFunction = async <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>, signal: AbortSignal | null = null) => {
     const headers: Record<string, string> = {};
     const fetchInit: RequestInit = {
         headers,
         method: options.method,
+        signal,
     };
     if (options.method === METHOD_PUT || options.method === METHOD_POST) {
         fetchInit.body = JSON.stringify(options.data);
