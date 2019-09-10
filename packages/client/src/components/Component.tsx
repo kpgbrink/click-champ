@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {ajaj, AjajFunctionOptionsType, AjajMethod} from './tools';
+import {ajaj, AjajFunctionOptionsType, AjajMethod} from '../tools';
 
 export {AjajMethod};
 
@@ -8,10 +8,13 @@ export default class Component<P= {}, S= {}, SS= any> extends React.PureComponen
 
     ajaj = async <TRequest, TResponse>(options: AjajFunctionOptionsType<TRequest>) => {
         try {
-            return await ajaj<TRequest, TRequest>(options, this.abortController.signal);
+            const response: TResponse = await ajaj<TRequest, TRequest>(options, this.abortController.signal);
+            return response;
         } catch (e) {
             if (e && e.name === 'AbortError' && this.abortController.signal.aborted) {
-
+                // empty
+                // tslint:disable-next-line: no-console
+                console.log("The abort thing happened");
             }
         }
     }

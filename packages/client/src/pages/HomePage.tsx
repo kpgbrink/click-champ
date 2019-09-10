@@ -1,7 +1,7 @@
 import React from 'react';
 import {createUseStyles} from 'react-jss';
 import IApple from '../../../types/IApple';
-import Component, {AjajMethod} from '../Component';
+import Component, {AjajMethod} from '../components/Component';
 
 // import logo from './logo.svg';
 

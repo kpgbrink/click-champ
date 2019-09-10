@@ -1,5 +1,6 @@
 import bodyParser from 'body-parser';
 import express from 'express';
+import delay from 'promise-delay-ts';
 import {
     Runtype,
     Static,
@@ -56,6 +57,7 @@ api.post('/apple', typedAsyncHandler(IEmptyRuntype, IEmptyRuntype, async () => {
 }));
 
 api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async apple => {
+    await delay(4000);
     if (apple.isGreen) {
         return {
             isGreen: true,
