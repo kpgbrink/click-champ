@@ -12,7 +12,6 @@ const useStyles = createUseStyles({
     '& span': {
       // jss-plugin-nested applies this to a child span
       fontWeight: 'bold', // jss-plugin-camel-case turns this into 'font-weight'
-
     },
     "backgroundColor": 'green',
     "color": 'green',
@@ -44,15 +43,24 @@ class HomePage extends Component<{}, {
     };
   }
   doSomethingNiceAsync = async () => {
-    const result = await this.ajaj<IApple, IApple>({
-      data: this.state.apple,
-      method: AjajMethod.POST,
-      uri: '/api/orange',
-    });
-
-    this.setState({
-      apple: result,
-    });
+    await this.runCancellableStatefulAsync(
+      {
+      },
+      async () => {
+        const res = await this.ajaj<IApple, IApple>({
+          data: this.state.apple,
+          method: AjajMethod.POST,
+          uri: '/api/orange',
+        });
+        this.setState({
+          apple: res,
+        });
+      },
+      {},
+      () => {
+        window.alert('Failed to post things');
+      },
+    );
   }
   render() {
     return <StylishHomePage apple={this.state.apple} onButtonClick={this.doSomethingNiceAsync} />;
