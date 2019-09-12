@@ -1,2 +1,2 @@
-[client](packages/client)
-[server](packages/server)
+* [client](packages/client)
+* [server](packages/server)
