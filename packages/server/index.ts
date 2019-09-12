@@ -1,4 +1,5 @@
 import bodyParser from 'body-parser';
+import dotenvByenv from 'dotenv-byenv';
 import express from 'express';
 import delay from 'promise-delay-ts';
 import {
@@ -11,7 +12,25 @@ import {
 import {
     IEmptyRuntype,
 } from '../types/IEmpty';
+import {
+    createConnectionAsync,
+    createGetRepositoryAsync,
+} from './src/db';
 import {User} from './src/entity/User';
+
+// Import process crash on rejection from the future.
+process.on('unhandledRejection', (reason, promise) => {
+    // tslint:disable-next-line: no-console
+    console.error(`Unhandled rejection:`, promise, `reason:`, reason);
+    process.exit(1);
+});
+
+// Load .env stuff into process.env.
+dotenvByenv.config();
+
+// Trigger connection errors early.
+const connectionPromise = createConnectionAsync();
+const getRepositoryAsync = createGetRepositoryAsync(connectionPromise);
 
 const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let endCalled = false;
@@ -58,6 +77,22 @@ api.post('/apple', typedAsyncHandler(IEmptyRuntype, IEmptyRuntype, async () => {
 }));
 
 api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async apple => {
+    const users = await getRepositoryAsync(User);
+    while (true) {
+        const user = await users.findOne(2);
+        // tslint:disable-next-line: no-console
+        console.log(user);
+        if (user !== undefined) {
+             break;
+        }
+        // User missing. Create!
+        await users.insert({
+            age: 28,
+            firstName: 'Nathan Phillip',
+            id: 2,
+            lastName: 'Brink',
+        });
+    }
     await delay(4000);
     if (apple.isGreen) {
         return {
