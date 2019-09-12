@@ -11,6 +11,7 @@ import {
 import {
     IEmptyRuntype,
 } from '../types/IEmpty';
+import {User} from './src/entity/User';
 
 const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let endCalled = false;
