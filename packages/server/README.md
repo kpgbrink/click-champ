@@ -11,8 +11,8 @@ $ psql -U postgres
 You may be prompted for your postgresql server's administrator account's password. You may have set this password to be the same as the account. Once in, create the user and database:
 
 ```
-postgresql=# CREATE USER clickchamp PASSWORD 'clickchamp';
-postgresql=# CREATE DATABASE clickchamp OWNER clickchamp;
+postgres=# CREATE USER clickchamp PASSWORD 'clickchamp';
+postgres=# CREATE DATABASE clickchamp OWNER clickchamp;
 ```
 
 ### Nondefault Configuration
