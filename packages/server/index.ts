@@ -7,14 +7,16 @@ import {
     Static,
 } from 'runtypes';
 import {
+    EntityManager,
+} from 'typeorm';
+import {
     IAppleRuntype,
 } from '../types/IApple';
 import {
     IEmptyRuntype,
 } from '../types/IEmpty';
 import {
-    createConnectionAsync,
-    createGetRepositoryAsync,
+    createManagerAsync,
 } from './src/db';
 import {User} from './src/entity/User';
 
@@ -29,8 +31,7 @@ process.on('unhandledRejection', (reason, promise) => {
 dotenvByenv.config();
 
 // Trigger connection errors early.
-const connectionPromise = createConnectionAsync();
-const getRepositoryAsync = createGetRepositoryAsync(connectionPromise);
+const managerPromise = createManagerAsync();
 
 const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response, next: express.NextFunction) => Promise<void>) => async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let endCalled = false;
@@ -57,14 +58,22 @@ const asyncHandler = (handlerAsync: (req: express.Request, res: express.Response
     }
 };
 
-const typedAsyncHandler = <TRequestRuntype extends Runtype, TResponseRuntype extends Runtype>(requestRuntype: TRequestRuntype, responseRuntype: TResponseRuntype, handlerAsync: (body: Static<typeof requestRuntype>) => Promise<Static<typeof responseRuntype>>) => {
+interface IRequestContext<T> {
+    body: T;
+    manager: EntityManager;
+}
+
+const typedAsyncHandler = <TRequestRuntype extends Runtype, TResponseRuntype extends Runtype>(requestRuntype: TRequestRuntype, responseRuntype: TResponseRuntype, handlerAsync: (context: IRequestContext<Static<typeof requestRuntype>>) => Promise<Static<typeof responseRuntype>>) => {
     return asyncHandler(async (req, res) => {
         const body: {} = req.body;
         if (!requestRuntype.guard(req.body)) {
             res.status(400).json("malformed POST data");
             return;
         }
-        const result = await handlerAsync(body);
+        const result = await handlerAsync({
+            body,
+            manager: await managerPromise,
+        });
         res.json(result);
     });
 };
@@ -76,17 +85,19 @@ api.post('/apple', typedAsyncHandler(IEmptyRuntype, IEmptyRuntype, async () => {
     return {};
 }));
 
-api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async apple => {
-    const users = await getRepositoryAsync(User);
+api.post('/orange', typedAsyncHandler(IAppleRuntype, IAppleRuntype, async ({
+    body: apple,
+    manager,
+}) => {
     while (true) {
-        const user = await users.findOne(2);
+        const user = await manager.findOne(User, 2);
         // tslint:disable-next-line: no-console
         console.log(user);
         if (user !== undefined) {
              break;
         }
         // User missing. Create!
-        await users.insert({
+        await manager.insert(User, {
             age: 28,
             firstName: 'Nathan Phillip',
             id: 2,

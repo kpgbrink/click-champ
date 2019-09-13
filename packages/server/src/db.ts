@@ -4,7 +4,7 @@ import {
 } from 'typeorm';
 import entities from './entity';
 
-export const createConnectionAsync = (async () => {
+export const createManagerAsync = (async () => {
     const connection = await createConnection({
         entities,
         type: 'postgres',
@@ -17,12 +17,5 @@ export const createConnectionAsync = (async () => {
     // lose data.
     await connection.runMigrations();
     await connection.synchronize();
-    return connection;
+    return connection.createEntityManager();
 });
-
-export const createGetRepositoryAsync = (connectionPromise: Promise<Connection>) => {
-    return async <T>(entity: new () => T) => {
-        const connection = await connectionPromise;
-        return connection.getRepository(entity);
-    };
-};
